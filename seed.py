@@ -49,10 +49,9 @@ def load_movies():
         movie_id, title, released_at, poop, imdb_url = row.split("|")[:5]
 
         #to remove date from title
-        title = title[:-7] 
+        title = title[:-7]
 
-        date_format = "%d-%b-%Y"
-        released_at = datetime.strptime(released_at, date_format)
+        released_at = datetime.strptime(released_at, "%d-%b-%Y")
 
         movie = Movie(movie_id=movie_id,
                       title=title,
