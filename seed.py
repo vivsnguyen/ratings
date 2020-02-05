@@ -73,13 +73,12 @@ def load_ratings():
 
     Rating.query.delete()
 
-    for row in open("seed_data/u.item"):
+    for row in open("seed_data/u.data"):
         row = row.rstrip()
-        movie_id, user_id, score, rating_id = row.split()
+        user_id, movie_id, score = row.split()[:3]
 
-        rating = Rating(rating_id=rating_id,
+        rating = Rating(user_id=user_id,
                         movie_id=movie_id,
-                        user_id=user_id,
                         score=score)
 
         db.session.add(rating)
