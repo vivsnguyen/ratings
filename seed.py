@@ -2,9 +2,9 @@
 
 from sqlalchemy import func
 from model import User
-# from model import Rating
-# from model import Movie
-
+from model import Rating
+from model import Movie
+from datetime import datetime
 from model import connect_to_db, db
 from server import app
 
@@ -37,9 +37,54 @@ def load_users():
 def load_movies():
     """Load movies from u.item into database."""
 
+    print("Movies")
+
+    # Delete all rows in table, so if we need to run this a second time,
+    # we won't be trying to add duplicate users
+    Movie.query.delete()
+
+    # Read u.user file and insert data
+    for row in open("seed_data/u.item"):
+        row = row.rstrip()
+        movie_id, title, released_at, poop, imdb_url = row.split("|")[:5]
+
+        #to remove date from title
+        title = title[:-7] 
+
+        date_format = "%d-%b-%Y"
+        released_at = datetime.strptime(released_at, date_format)
+
+        movie = Movie(movie_id=movie_id,
+                      title=title,
+                      released_at=released_at,
+                      imdb_url=imdb_url)
+
+        # We need to add to the session or it won't ever be stored
+        db.session.add(movie)
+
+    # Once we're done, we should commit our work
+    db.session.commit()
+
 
 def load_ratings():
     """Load ratings from u.data into database."""
+
+    print("Ratings")
+
+    Rating.query.delete()
+
+    for row in open("seed_data/u.item"):
+        row = row.rstrip()
+        movie_id, user_id, score, rating_id = row.split()
+
+        rating = Rating(rating_id=rating_id,
+                        movie_id=movie_id,
+                        user_id=user_id,
+                        score=score)
+
+        db.session.add(rating)
+
+    db.session.commit()
 
 
 def set_val_user_id():
