@@ -40,7 +40,7 @@ def register_process():
     # print(email)
     # print("hello Line 38!!!!")
     # print(User.query.get(email))
-    if User.query.get(email) is None:
+    if not User.query.filter_by(email=email).first():
         user = User(email=email, password=password, zipcode=zipcode, age=age)
         db.session.add(user)
         db.session.commit()
