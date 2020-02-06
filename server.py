@@ -35,24 +35,64 @@ def register_form():
 def register_process():
     email = request.form.get('email')
     password = request.form.get('password')
-    age = int(request.form.get('age'))
-    zipcode = request.form.get('zipcode')
-    # print(email)
-    # print("hello Line 38!!!!")
-    # print(User.query.get(email))
+    # age = int(request.form.get('age'))
+    # zipcode = request.form.get('zipcode')
+
     if not User.query.filter_by(email=email).first():
-        user = User(email=email, password=password, zipcode=zipcode, age=age)
+        user = User(email=email, password=password)
+        # zipcode=zipcode, age=age
         db.session.add(user)
         db.session.commit()
 
+    else:
+        return redirect('/')
+        #placeholder
+
     return redirect('/')
 
+@app.route('/log_in', methods=["GET"])
+def log_in():
+
+    return render_template("log_in.html")
+
+@app.route('/log_in', methods=["POST"])
+def log_in_form():
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    db_user = User.query.filter_by(email=email).first()
+    db_password = db_user.password
+
+    if password == db_password:
+        session['user_id'] = db_user.user_id
+        flash('You were successfully logged in.')
+        return redirect('/')
+
+    else:
+        flash('Incorrect username or password.')
+        return redirect('/log_in')
+
+
+@app.route('/log_out', methods=["GET"])
+def log_out():    
+    del session['user_id']
+    flash('User logged out.')
+    print(session)
+    return redirect('/')
 
 @app.route('/users')
 def user_list():
     """Show list of users."""
     users = User.query.all()
     return render_template("user_list.html", users=users)
+
+@app.route('/users/<user_id>')
+#route to /945 user id
+def user_details(user_id):
+
+    user = User.query.filter_by(user_id=user_id).first()
+
+    return render_template("user_details.html", user=user)
 
 
 if __name__ == "__main__":
